@@ -14,9 +14,10 @@ class HomeController extends GetxController {
   }
 
   scannPackage() {
+    availableDevice.clear();
     FlutterBluePlus.onScanResults.listen((results) {
       if (results.isNotEmpty) {
-        ScanResult r = results.last; // the most recently found device
+        ScanResult r = results.last;
         availableDevice = results;
         print('${r.device.remoteId}: "${r.advertisementData.advName}" found!');
       }
