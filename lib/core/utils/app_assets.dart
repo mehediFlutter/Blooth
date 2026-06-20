@@ -3,6 +3,7 @@ class AppAssets {
   static const String icon = '$assets/icons';
   static const String lottie = '$assets/lottie';
   static const String font = '$assets/font';
+  static const String greatVibesFamily = 'GreatVibes';
 
   static const String blooth = '$icon/bluetooth.jpg';
   static const String flutterIcon = '$icon/flutter_icon.jpg';

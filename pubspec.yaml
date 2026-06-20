@@ -15,6 +15,9 @@ dependencies:
   flutter_blue_plus: ^2.3.9
   lottie: ^3.3.3
   get: ^4.7.3
+  animated_text_kit: ^4.3.0
+  logger: ^2.7.0
+  toastification: ^3.2.0
 
 dev_dependencies:
   flutter_test:

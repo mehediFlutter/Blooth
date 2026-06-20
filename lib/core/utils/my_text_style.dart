@@ -9,7 +9,7 @@ class MyTextStyle {
   /// Description - Nunito
 
   static TextStyle largeHeading16W600({
-    String fontFamily = AppAssets.greatVibes,
+    String fontFamily = AppAssets.greatVibesFamily,
   }) {
     return TextStyle(
       fontFamily: fontFamily,
@@ -19,8 +19,8 @@ class MyTextStyle {
     );
   }
 
-  static TextStyle heading32W500greatVibes({
-    String fontFamily = AppAssets.greatVibes,
+  static TextStyle heading32W500greatVibesFamily({
+    String fontFamily = AppAssets.greatVibesFamily,
   }) {
     return TextStyle(
       fontFamily: fontFamily,
@@ -31,7 +31,7 @@ class MyTextStyle {
   }
 
   static TextStyle extraLarge40W700({
-    String fontFamily = AppAssets.greatVibes,
+    String fontFamily = AppAssets.greatVibesFamily,
   }) {
     return TextStyle(
       fontFamily: fontFamily,
@@ -41,8 +41,8 @@ class MyTextStyle {
     );
   }
 
-  static TextStyle medium16W400greatVibes({
-    String fontFamily = AppAssets.greatVibes,
+  static TextStyle medium16W400greatVibesFamily({
+    String fontFamily = AppAssets.greatVibesFamily,
   }) {
     return TextStyle(
       fontFamily: fontFamily,
@@ -52,7 +52,9 @@ class MyTextStyle {
     );
   }
 
-  static TextStyle largeDM18W600({String fontFamily = AppAssets.greatVibes}) {
+  static TextStyle largeDM18W600({
+    String fontFamily = AppAssets.greatVibesFamily,
+  }) {
     return TextStyle(
       fontFamily: fontFamily,
       fontSize: 20,
@@ -61,7 +63,9 @@ class MyTextStyle {
     );
   }
 
-  static TextStyle smallDM12W400({String fontFamily = AppAssets.greatVibes}) {
+  static TextStyle smallDM12W400({
+    String fontFamily = AppAssets.greatVibesFamily,
+  }) {
     return TextStyle(
       fontFamily: fontFamily,
       fontSize: 12,
@@ -70,7 +74,9 @@ class MyTextStyle {
     );
   }
 
-  static TextStyle smallDM14W400({String fontFamily = AppAssets.greatVibes}) {
+  static TextStyle smallDM14W400({
+    String fontFamily = AppAssets.greatVibesFamily,
+  }) {
     return TextStyle(
       fontFamily: fontFamily,
       fontSize: 14,
@@ -79,7 +85,9 @@ class MyTextStyle {
     );
   }
 
-  static TextStyle smallDM14W600({String fontFamily = AppAssets.greatVibes}) {
+  static TextStyle smallDM14W600({
+    String fontFamily = AppAssets.greatVibesFamily,
+  }) {
     return TextStyle(
       fontFamily: fontFamily,
       fontSize: 14,
@@ -88,7 +96,9 @@ class MyTextStyle {
     );
   }
 
-  static TextStyle mediumDM16W400({String fontFamily = AppAssets.greatVibes}) {
+  static TextStyle mediumDM16W400({
+    String fontFamily = AppAssets.greatVibesFamily,
+  }) {
     return TextStyle(
       fontFamily: fontFamily,
       fontSize: 16,
@@ -97,7 +107,9 @@ class MyTextStyle {
     );
   }
 
-  static TextStyle medimumDM16W600({String fontFamily = AppAssets.greatVibes}) {
+  static TextStyle medimumDM16W600({
+    String fontFamily = AppAssets.greatVibesFamily,
+  }) {
     return TextStyle(
       fontFamily: fontFamily,
       fontSize: 16,

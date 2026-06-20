@@ -1,3 +1,5 @@
 class AppString {
   static const String scanningBlooth = 'Scanning Blooth';
+  static const String bloothOff =
+      'Bluetooth is off. Please turn on your Bluetooth';
 }
