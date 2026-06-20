@@ -1,7 +1,6 @@
 import 'package:blooth/core/utils/log.dart';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 import 'package:get/get.dart';
-import 'package:flutter/foundation.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 class HomeController extends GetxController {
@@ -15,24 +14,33 @@ class HomeController extends GetxController {
 
   List<ScanResult> availableDevice = [];
 
-  void scannPackage() {
-    availableDevice.clear();
-    update();
+  void scannPackage() async {
+    printX('====== scannPackage =====');
 
-    // 1. FIRST: listen results
-    FlutterBluePlus.scanResults.listen((results) {
-      if (results.isNotEmpty) {
-        availableDevice = results;
+    var subscription = FlutterBluePlus.onScanResults.listen((results) {
+      if (results.isEmpty) return;
 
-        ScanResult r = results.last;
+      for (var r in results) {
+        final name = r.device.platformName.isNotEmpty
+            ? r.device.platformName
+            : r.advertisementData.advName;
 
-        printX('${r.device.remoteId}: "${r.advertisementData.advName}" found!');
-
-        update();
+        print(
+          ' =================DEVICE: $name | ID: ${r.device.remoteId} | RSSI: ${r.rssi}',
+        );
       }
-    }, onError: (e) => debugPrint('$e'));
+    }, onError: (e) => print(e));
 
-    // 2. THEN: start scan
-    FlutterBluePlus.startScan(timeout: const Duration(seconds: 12));
+    FlutterBluePlus.cancelWhenScanComplete(subscription);
+
+    // wait Bluetooth ON
+    await FlutterBluePlus.adapterState
+        .where((val) => val == BluetoothAdapterState.on)
+        .first;
+
+    // IMPORTANT: no filter
+    await FlutterBluePlus.startScan(timeout: const Duration(seconds: 15));
+
+    await FlutterBluePlus.isScanning.where((val) => val == false).first;
   }
 }
