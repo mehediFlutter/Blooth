@@ -25,7 +25,6 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     final controller = Get.put(HomeController());
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      // controller.startScan();
       controller.scannPackage();
     });
 
@@ -44,6 +43,7 @@ class _HomeScreenState extends State<HomeScreen> {
               child: RefreshIndicator(
                 onRefresh: () async {
                   BloothService.chekBloothOn();
+                  controller.scannPackage();
                 },
                 child: SingleChildScrollView(
                   physics: AlwaysScrollableScrollPhysics(),
@@ -84,14 +84,63 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
 
                       BloothItem(),
-                      ...List.generate(controller.availableDevice.length, (
-                        index,
-                      ) {
-                        return Text(
-                          'index ${index}',
-                          style: MyTextStyle.largeDM18W600(),
-                        );
-                      }),
+                      if (controller.availableDevice.isEmpty)
+                        Padding(
+                          padding: const EdgeInsets.only(top: 12),
+                          child: Text(
+                            'No available device found yet',
+                            style: MyTextStyle.largeDM18W600(),
+                          ),
+                        )
+                      else
+                        ...List.generate(controller.availableDevice.length, (
+                          index,
+                        ) {
+                          final device = controller.availableDevice[index];
+                          final name =
+                              device.advertisementData.advName.isNotEmpty
+                              ? device.advertisementData.advName
+                              : device.device.platformName.isNotEmpty
+                              ? device.device.platformName
+                              : 'Unknown device';
+
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: Dimensions.space20,
+                              vertical: 6,
+                            ),
+                            child: Container(
+                              width: double.infinity,
+                              padding: const EdgeInsets.all(16),
+                              decoration: BoxDecoration(
+                                color: AppColor.white,
+                                borderRadius: BorderRadius.circular(16),
+                                border: Border.all(
+                                  color: AppColor.primaryColor.withValues(
+                                    alpha: 0.15,
+                                  ),
+                                ),
+                              ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    name,
+                                    style: MyTextStyle.largeDM18W600(),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    device.device.remoteId.str,
+                                    style: MyTextStyle.largeDM18W600().copyWith(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w400,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          );
+                        }),
                     ],
                   ),
                 ),
