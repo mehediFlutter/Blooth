@@ -40,3 +40,6 @@ flutter:
     - family: GreatVibes
       fonts:
         - asset: assets/font/GreatVibes-Regular.ttf
+    - family: Exo2Italic
+      fonts:
+        - asset: assets/font/Exo2-Italic-VariableFont_wght.ttf

@@ -1,136 +1,111 @@
+import 'package:blooth_4/core/utils/app_assets.dart';
 import 'package:blooth_4/core/utils/app_color.dart';
+import 'package:blooth_4/core/utils/app_string.dart';
 import 'package:blooth_4/core/utils/dimensions.dart';
+import 'package:blooth_4/core/utils/my_text_style.dart';
+import 'package:blooth_4/core/utils/space_up_down.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_blue_plus/flutter_blue_plus.dart';
+import 'package:get/get_utils/src/extensions/internacionalization.dart';
 
 class BloothItem extends StatelessWidget {
-  const BloothItem({super.key});
+  final ScanResult deviceItem;
+  const BloothItem({super.key, required this.deviceItem});
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(Dimensions.space20),
-      child: ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: 260),
-        child: Container(
-          height: 260,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(20),
-            gradient: const LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [Color(0xFF1A1F08), Color(0xFF7E8C00), Color(0xFFB8C900)],
-              stops: [0.0, 0.52, 1.0],
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: AppColor.primaryColor.withValues(alpha: 0.22),
-                blurRadius: 24,
-                offset: const Offset(0, 12),
-              ),
-            ],
+    final name = deviceItem.advertisementData.advName.isNotEmpty
+        ? deviceItem.advertisementData.advName
+        : deviceItem.device.platformName.isNotEmpty
+        ? deviceItem.device.platformName
+        : 'Unknown device';
+    return ConstrainedBox(
+      constraints: const BoxConstraints(maxWidth: 260),
+      child: Container(
+        height: 260,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(Dimensions.space8),
+          gradient: const LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [Color(0xFF1A1F08), Color(0xFF7E8C00), Color(0xFFB8C900)],
+            stops: [0.0, 0.52, 1.0],
           ),
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(14, 14, 14, 12),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                RichText(
-                  text: const TextSpan(
+          boxShadow: [
+            BoxShadow(
+              color: AppColor.primaryColor.withValues(alpha: 0.22),
+              blurRadius: 24,
+              offset: const Offset(0, 12),
+            ),
+          ],
+        ),
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(14, 14, 14, 12),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                deviceItem.advertisementData.advName.isNotEmpty
+                    ? deviceItem.advertisementData.advName
+                    : deviceItem.device.platformName.isNotEmpty
+                    ? deviceItem.device.platformName
+                    : AppString.unknownDevice.tr,
+                style: MyTextStyle.smallDM12W400().copyWith(
+                  color: AppColor.white,
+                  fontSize: Dimensions.space14,
+                  fontFamily: AppAssets.exo2,
+                ),
+              ),
+              spaceDown(Dimensions.space16),
+
+              Center(
+                child: Text(
+                  'Very close',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w300,
+                    height: 1,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 8),
+              Center(
+                child: SizedBox(
+                  child: Stack(
+                    alignment: Alignment.center,
                     children: [
-                      TextSpan(
-                        text: 'Device Name ',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 17,
-                          fontWeight: FontWeight.w600,
-                          height: 1.1,
+                      Container(
+                        height: 2,
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: [
+                              Colors.white.withValues(alpha: 0.35),
+                              Colors.white.withValues(alpha: 0.9),
+                              Colors.white.withValues(alpha: 0.35),
+                            ],
+                          ),
                         ),
                       ),
-                      TextSpan(
-                        text: 'Device type',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 17,
-                          fontWeight: FontWeight.w400,
-                          height: 1.1,
-                        ),
+                      const Icon(
+                        Icons.arrow_drop_down,
+                        color: Colors.white,
+                        size: 22,
                       ),
                     ],
                   ),
                 ),
-                const Spacer(),
-                Center(
-                  child: Text(
-                    'Very close',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 14,
-                      fontWeight: FontWeight.w300,
-                      height: 1,
-                    ),
-                  ),
+              ),
+              spaceDown(8),
+              Text(
+                deviceItem.device.remoteId.str,
+                style: TextStyle(
+                  color: Colors.white.withValues(alpha: 0.28),
+                  fontSize: 11,
+                  fontWeight: FontWeight.w500,
                 ),
-                const SizedBox(height: 8),
-                Center(
-                  child: SizedBox(
-                    width: 210,
-                    child: Stack(
-                      alignment: Alignment.center,
-                      children: [
-                        Container(
-                          height: 2,
-                          decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              colors: [
-                                Colors.white.withValues(alpha: 0.35),
-                                Colors.white.withValues(alpha: 0.9),
-                                Colors.white.withValues(alpha: 0.35),
-                              ],
-                            ),
-                          ),
-                        ),
-                        const Icon(
-                          Icons.arrow_drop_down,
-                          color: Colors.white,
-                          size: 22,
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 10),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      'Natural',
-                      style: TextStyle(
-                        color: Colors.white.withValues(alpha: 0.28),
-                        fontSize: 11,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                    Text(
-                      'Artificial',
-                      style: TextStyle(
-                        color: Colors.white.withValues(alpha: 0.78),
-                        fontSize: 11,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ],
-                ),
-                const Spacer(),
-                Text(
-                  'Vitamin D',
-                  style: TextStyle(
-                    color: Colors.white.withValues(alpha: 0.45),
-                    fontSize: 12,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ),

@@ -5,13 +5,14 @@ import 'package:get/get.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 class HomeController extends GetxController {
-  StreamSubscription<List<ScanResult>>? _scanResultsSubscription;
+  StreamSubscription<List<ScanResult>>? scanResultsSubscription;
+  List<ScanResult> availableDevice = [];
 
   @override
   void onInit() {
     super.onInit();
 
-    _scanResultsSubscription = FlutterBluePlus.scanResults.listen((results) {
+    scanResultsSubscription = FlutterBluePlus.scanResults.listen((results) {
       final devices = <String, ScanResult>{};
 
       for (final r in results) {
@@ -26,10 +27,19 @@ class HomeController extends GetxController {
         devices[r.device.remoteId.str] = r;
       }
 
-      availableDevice = devices.values.toList()
-        ..sort((a, b) => b.rssi.compareTo(a.rssi));
+      availableDevice = devices.values.toList();
       update();
     }, onError: (e) => printX(e));
+  }
+
+  Future<void> scannPackage() async {
+    availableDevice = [];
+    update();
+    await FlutterBluePlus.stopScan();
+    await FlutterBluePlus.startScan(
+      timeout: const Duration(seconds: 60),
+      androidUsesFineLocation: true,
+    );
   }
 
   Future<void> permision() async {
@@ -38,34 +48,5 @@ class HomeController extends GetxController {
       Permission.bluetoothConnect,
       Permission.locationWhenInUse,
     ].request();
-  }
-
-  List<ScanResult> availableDevice = [];
-
-  Future<void> scannPackage() async {
-    printX('====== scannPackage =====');
-
-    availableDevice = [];
-    update();
-
-    // wait Bluetooth ON
-    await FlutterBluePlus.adapterState
-        .where((val) => val == BluetoothAdapterState.on)
-        .first;
-
-    // IMPORTANT: no filter
-    await FlutterBluePlus.stopScan();
-    await FlutterBluePlus.startScan(
-      timeout: const Duration(seconds: 60),
-      androidUsesFineLocation: true,
-    );
-
-    await FlutterBluePlus.isScanning.where((val) => val == false).first;
-  }
-
-  @override
-  void onClose() {
-    _scanResultsSubscription?.cancel();
-    super.onClose();
   }
 }

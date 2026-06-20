@@ -42,10 +42,11 @@ class _HomeScreenState extends State<HomeScreen> {
               child: RefreshIndicator(
                 onRefresh: () async {
                   BloothService.chekBloothOn();
-                  await controller.permision();
+
                   await controller.scannPackage();
                 },
                 child: SingleChildScrollView(
+                  padding: EdgeInsets.symmetric(horizontal: Dimensions.space16),
                   physics: AlwaysScrollableScrollPhysics(),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.center,
@@ -82,65 +83,29 @@ class _HomeScreenState extends State<HomeScreen> {
                           ),
                         ],
                       ),
+                      GridView.builder(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        gridDelegate:
+                            const SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 2, // 2 items per row
+                              crossAxisSpacing: 6,
+                              mainAxisSpacing: 6,
+                              childAspectRatio: 1.2,
+                            ),
+                        itemCount: controller.availableDevice.length,
+                        itemBuilder: (context, index) {
+                          final deviceItem = controller.availableDevice[index];
+                          return BloothItem(deviceItem: deviceItem);
+                        },
+                      ),
 
-                      BloothItem(),
                       if (controller.availableDevice.isEmpty)
-                        Padding(
-                          padding: const EdgeInsets.only(top: 12),
-                          child: Text(
-                            'No available device found yet',
-                            style: MyTextStyle.largeDM18W600(),
-                          ),
-                        )
-                      else
-                        ...List.generate(controller.availableDevice.length, (
-                          index,
-                        ) {
-                          final device = controller.availableDevice[index];
-                          final name =
-                              device.advertisementData.advName.isNotEmpty
-                              ? device.advertisementData.advName
-                              : device.device.platformName.isNotEmpty
-                              ? device.device.platformName
-                              : 'Unknown device';
-
-                          return Padding(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: Dimensions.space20,
-                              vertical: 6,
-                            ),
-                            child: Container(
-                              width: double.infinity,
-                              padding: const EdgeInsets.all(16),
-                              decoration: BoxDecoration(
-                                color: AppColor.white,
-                                borderRadius: BorderRadius.circular(16),
-                                border: Border.all(
-                                  color: AppColor.primaryColor.withValues(
-                                    alpha: 0.15,
-                                  ),
-                                ),
-                              ),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    name,
-                                    style: MyTextStyle.largeDM18W600(),
-                                  ),
-                                  const SizedBox(height: 4),
-                                  Text(
-                                    device.device.remoteId.str,
-                                    style: MyTextStyle.largeDM18W600().copyWith(
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w400,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          );
-                        }),
+                        Lottie.asset(
+                          AppAssets.bloothScan,
+                          height: 200,
+                          width: 200,
+                        ),
                     ],
                   ),
                 ),
