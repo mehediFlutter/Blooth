@@ -2,20 +2,18 @@ import 'package:blooth/core/utils/log.dart';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 import 'package:get/get.dart';
 import 'package:flutter/foundation.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class HomeController extends GetxController {
-  List<ScanResult> availableDevice = [];
-
-  void startScan() {
-    availableDevice.clear();
-    update();
-    FlutterBluePlus.startScan(timeout: const Duration(seconds: 15));
-
-    FlutterBluePlus.scanResults.listen((results) {
-      availableDevice = results;
-      update();
-    });
+  Future<void> permision() async {
+    await [
+      Permission.bluetoothScan,
+      Permission.bluetoothConnect,
+      Permission.locationWhenInUse,
+    ].request();
   }
+
+  List<ScanResult> availableDevice = [];
 
   void scannPackage() {
     availableDevice.clear();

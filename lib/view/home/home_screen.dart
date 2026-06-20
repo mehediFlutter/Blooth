@@ -12,6 +12,7 @@ import 'package:blooth/view/home/component/blooth_item.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:lottie/lottie.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
