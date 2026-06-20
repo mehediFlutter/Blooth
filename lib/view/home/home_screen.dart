@@ -51,7 +51,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      spaceDown(Dimensions.space20),
+                      spaceDown(Dimensions.space10),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
@@ -84,6 +84,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         ],
                       ),
                       GridView.builder(
+                        padding: EdgeInsets.only(top: Dimensions.space16),
                         shrinkWrap: true,
                         physics: const NeverScrollableScrollPhysics(),
                         gridDelegate:

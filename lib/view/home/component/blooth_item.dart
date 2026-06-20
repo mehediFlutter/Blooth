@@ -14,11 +14,6 @@ class BloothItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final name = deviceItem.advertisementData.advName.isNotEmpty
-        ? deviceItem.advertisementData.advName
-        : deviceItem.device.platformName.isNotEmpty
-        ? deviceItem.device.platformName
-        : 'Unknown device';
     return ConstrainedBox(
       constraints: const BoxConstraints(maxWidth: 260),
       child: Container(
@@ -69,7 +64,7 @@ class BloothItem extends StatelessWidget {
                   ),
                 ),
               ),
-              const SizedBox(height: 8),
+              spaceDown(Dimensions.space8),
               Center(
                 child: SizedBox(
                   child: Stack(
@@ -97,12 +92,14 @@ class BloothItem extends StatelessWidget {
                 ),
               ),
               spaceDown(8),
-              Text(
-                deviceItem.device.remoteId.str,
-                style: TextStyle(
-                  color: Colors.white.withValues(alpha: 0.28),
-                  fontSize: 11,
-                  fontWeight: FontWeight.w500,
+              Flexible(
+                child: Text(
+                  deviceItem.device.remoteId.str,
+                  style: TextStyle(
+                    color: Colors.white.withValues(alpha: 0.28),
+                    fontSize: 11,
+                    fontWeight: FontWeight.w500,
+                  ),
                 ),
               ),
             ],
