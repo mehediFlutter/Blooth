@@ -1,8 +1,5 @@
-import 'dart:ui';
-
-import 'package:blooth/core/utils/app_color.dart';
-import 'package:blooth/core/utils/dimensions.dart';
-import 'package:blooth/core/utils/my_text_style.dart';
+import 'package:blooth_4/core/utils/app_color.dart';
+import 'package:blooth_4/core/utils/dimensions.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:toastification/toastification.dart';

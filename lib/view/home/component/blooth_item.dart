@@ -1,5 +1,5 @@
-import 'package:blooth/core/utils/app_color.dart';
-import 'package:blooth/core/utils/dimensions.dart';
+import 'package:blooth_4/core/utils/app_color.dart';
+import 'package:blooth_4/core/utils/dimensions.dart';
 import 'package:flutter/material.dart';
 
 class BloothItem extends StatelessWidget {
