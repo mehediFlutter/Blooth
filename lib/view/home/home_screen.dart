@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:blooth/component/annotated_region/annotated_region_widget.dart';
 import 'package:blooth/core/blooth_service/blooth_service.dart';
@@ -12,10 +10,8 @@ import 'package:blooth/core/utils/space_up_down.dart';
 import 'package:blooth/data/controller/home/home_controller.dart';
 import 'package:blooth/view/home/component/blooth_item.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 import 'package:get/get.dart';
 import 'package:lottie/lottie.dart';
-import 'package:permission_handler/permission_handler.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -25,30 +21,13 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  BluetoothAdapterState _adapterState = BluetoothAdapterState.unknown;
-  late StreamSubscription<BluetoothAdapterState> _adapterStateStateSubscription;
-
   @override
   void initState() {
     super.initState();
     final controller = Get.put(HomeController());
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      controller.scannPackage();
-      _adapterStateStateSubscription = FlutterBluePlus.adapterState.listen((
-        state,
-      ) {
-        _adapterState = state;
-        if (mounted) {
-          setState(() {});
-        }
-      });
+      controller.permision().then((_) => controller.scannPackage());
     });
-  }
-
-  @override
-  void dispose() {
-    _adapterStateStateSubscription.cancel();
-    super.dispose();
   }
 
   @override
@@ -63,7 +42,8 @@ class _HomeScreenState extends State<HomeScreen> {
               child: RefreshIndicator(
                 onRefresh: () async {
                   BloothService.chekBloothOn();
-                  controller.scannPackage();
+                  await controller.permision();
+                  await controller.scannPackage();
                 },
                 child: SingleChildScrollView(
                   physics: AlwaysScrollableScrollPhysics(),

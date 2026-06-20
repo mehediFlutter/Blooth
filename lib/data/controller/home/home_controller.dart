@@ -14,22 +14,32 @@ class HomeController extends GetxController {
 
   List<ScanResult> availableDevice = [];
 
-  void scannPackage() async {
+  Future<void> scannPackage() async {
     printX('====== scannPackage =====');
+
+    availableDevice = [];
+    update();
 
     var subscription = FlutterBluePlus.onScanResults.listen((results) {
       if (results.isEmpty) return;
 
+      final devices = <String, ScanResult>{};
       for (var r in results) {
         final name = r.device.platformName.isNotEmpty
             ? r.device.platformName
             : r.advertisementData.advName;
 
-        print(
+        printX(
           ' =================DEVICE: $name | ID: ${r.device.remoteId} | RSSI: ${r.rssi}',
         );
+
+        devices[r.device.remoteId.str] = r;
       }
-    }, onError: (e) => print(e));
+
+      availableDevice = devices.values.toList()
+        ..sort((a, b) => b.rssi.compareTo(a.rssi));
+      update();
+    }, onError: (e) => printX(e));
 
     FlutterBluePlus.cancelWhenScanComplete(subscription);
 
@@ -39,7 +49,7 @@ class HomeController extends GetxController {
         .first;
 
     // IMPORTANT: no filter
-    await FlutterBluePlus.startScan(timeout: const Duration(seconds: 15));
+    await FlutterBluePlus.startScan(timeout: const Duration(seconds: 60));
 
     await FlutterBluePlus.isScanning.where((val) => val == false).first;
   }
