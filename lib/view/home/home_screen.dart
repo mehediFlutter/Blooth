@@ -9,6 +9,7 @@ import 'package:blooth_4/core/utils/my_text_style.dart';
 import 'package:blooth_4/core/utils/space_up_down.dart';
 import 'package:blooth_4/data/controller/home/home_controller.dart';
 import 'package:blooth_4/view/home/component/blooth_item.dart';
+import 'package:blooth_4/view/home/component/hacker_reveal_show.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:lottie/lottie.dart';
@@ -97,7 +98,10 @@ class _HomeScreenState extends State<HomeScreen> {
                         itemCount: controller.availableDevice.length,
                         itemBuilder: (context, index) {
                           final deviceItem = controller.availableDevice[index];
-                          return BloothItem(deviceItem: deviceItem);
+                          return HackerRevealTile(
+                            index: index,
+                            child: BloothItem(deviceItem: deviceItem),
+                          );
                         },
                       ),
 
