@@ -21,7 +21,7 @@ class HomeController extends GetxController {
         final resolvedName = _resolveDeviceName(r, remoteId);
 
         printX(
-          '=================DEVICE: $resolvedName | ID: ${r.device.remoteId} | RSSI: ${r.rssi}',
+          '================= DEVICE: $resolvedName | ID: ${r.device.remoteId} | RSSI: ${r.rssi}',
         );
 
         _deviceNameCache[remoteId] = resolvedName;
