@@ -92,7 +92,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               crossAxisCount: 2, // 2 items per row
                               crossAxisSpacing: 6,
                               mainAxisSpacing: 6,
-                              childAspectRatio: 1.2,
+                              mainAxisExtent: 300,
                             ),
                         itemCount: controller.availableDevice.length,
                         itemBuilder: (context, index) {

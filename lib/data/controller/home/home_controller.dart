@@ -7,6 +7,7 @@ import 'package:permission_handler/permission_handler.dart';
 class HomeController extends GetxController {
   StreamSubscription<List<ScanResult>>? scanResultsSubscription;
   List<ScanResult> availableDevice = [];
+  final Map<String, String> _deviceNameCache = {};
 
   @override
   void onInit() {
@@ -16,20 +17,56 @@ class HomeController extends GetxController {
       final devices = <String, ScanResult>{};
 
       for (final r in results) {
-        final name = r.device.platformName.isNotEmpty
-            ? r.device.platformName
-            : r.advertisementData.advName;
+        final remoteId = r.device.remoteId.str;
+        final resolvedName = _resolveDeviceName(r, remoteId);
 
         printX(
-          '=================DEVICE: $name | ID: ${r.device.remoteId} | RSSI: ${r.rssi}',
+          '=================DEVICE: $resolvedName | ID: ${r.device.remoteId} | RSSI: ${r.rssi}',
         );
 
-        devices[r.device.remoteId.str] = r;
+        _deviceNameCache[remoteId] = resolvedName;
+        devices[remoteId] = _mergeResult(r, resolvedName);
       }
 
       availableDevice = devices.values.toList();
       update();
     }, onError: (e) => printX(e));
+  }
+
+  String _resolveDeviceName(ScanResult result, String remoteId) {
+    final advName = result.advertisementData.advName.trim();
+    if (advName.isNotEmpty) {
+      return advName;
+    }
+
+    final platformName = result.device.platformName.trim();
+    if (platformName.isNotEmpty) {
+      return platformName;
+    }
+
+    final cachedName = _deviceNameCache[remoteId]?.trim();
+    if (cachedName != null && cachedName.isNotEmpty) {
+      return cachedName;
+    }
+
+    return remoteId;
+  }
+
+  ScanResult _mergeResult(ScanResult result, String resolvedName) {
+    return ScanResult(
+      device: result.device,
+      advertisementData: AdvertisementData(
+        advName: resolvedName,
+        txPowerLevel: result.advertisementData.txPowerLevel,
+        appearance: result.advertisementData.appearance,
+        connectable: result.advertisementData.connectable,
+        manufacturerData: result.advertisementData.manufacturerData,
+        serviceData: result.advertisementData.serviceData,
+        serviceUuids: result.advertisementData.serviceUuids,
+      ),
+      rssi: result.rssi,
+      timeStamp: result.timeStamp,
+    );
   }
 
   Future<void> scannPackage() async {
@@ -48,5 +85,33 @@ class HomeController extends GetxController {
       Permission.bluetoothConnect,
       Permission.locationWhenInUse,
     ].request();
+  }
+
+  /// device name
+  String deviceName(ScanResult deviceItem) {
+    final advName = deviceItem.advertisementData.advName.trim();
+    if (advName.isNotEmpty) {
+      return advName;
+    }
+
+    final platformName = deviceItem.device.platformName.trim();
+    if (platformName.isNotEmpty) {
+      return platformName;
+    }
+
+    return deviceItem.device.remoteId.str;
+  }
+
+  String distanceLabel(double distance) {
+    if (distance <= 1) {
+      return 'Very close';
+    }
+    if (distance <= 3) {
+      return 'Close';
+    }
+    if (distance <= 6) {
+      return 'Far';
+    }
+    return 'Very far';
   }
 }

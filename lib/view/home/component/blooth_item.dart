@@ -1,23 +1,75 @@
+import 'dart:math' as math;
 import 'package:blooth_4/core/utils/app_assets.dart';
 import 'package:blooth_4/core/utils/app_color.dart';
-import 'package:blooth_4/core/utils/app_string.dart';
 import 'package:blooth_4/core/utils/dimensions.dart';
 import 'package:blooth_4/core/utils/my_text_style.dart';
 import 'package:blooth_4/core/utils/space_up_down.dart';
+import 'package:blooth_4/data/controller/home/home_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
-import 'package:get/get_utils/src/extensions/internacionalization.dart';
+import 'package:get/get.dart';
 
 class BloothItem extends StatelessWidget {
   final ScanResult deviceItem;
-  const BloothItem({super.key, required this.deviceItem});
+  final HomeController controller = Get.find();
+  BloothItem({super.key, required this.deviceItem});
+
+  double _distanceMeters() {
+    final txPower = deviceItem.advertisementData.txPowerLevel ?? -59;
+    final rssi = deviceItem.rssi;
+    final pathLoss = (txPower - rssi) / (10 * 2.0);
+    return math.pow(10, pathLoss).toDouble();
+  }
+
+  Alignment _arrowAlignment(double distance) {
+    return distance <= 3 ? Alignment.centerLeft : Alignment.centerRight;
+  }
+
+  String _formatBytes(List<int> bytes) {
+    if (bytes.isEmpty) {
+      return '-';
+    }
+
+    return bytes
+        .take(4)
+        .map((value) => value.toRadixString(16).padLeft(2, '0'))
+        .join(' ')
+        .toUpperCase();
+  }
+
+  Widget _infoChip(String label, String value) {
+    return Text(
+      '$label: $value',
+      maxLines: 1,
+      overflow: TextOverflow.ellipsis,
+      style: TextStyle(
+        color: Colors.white,
+        fontSize: 10,
+        fontWeight: FontWeight.w500,
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
+    final distanceMeters = _distanceMeters();
+    final distanceLabel = controller.distanceLabel(distanceMeters);
+
+    final arrowAlignment = _arrowAlignment(distanceMeters);
+
+    final serviceUuids = deviceItem.advertisementData.serviceUuids;
+    final manufacturerEntries = deviceItem
+        .advertisementData
+        .manufacturerData
+        .entries
+        .toList();
+    final serviceDataEntries = deviceItem.advertisementData.serviceData.entries
+        .toList();
+
     return ConstrainedBox(
       constraints: const BoxConstraints(maxWidth: 260),
       child: Container(
-        height: 260,
+        height: 300,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(Dimensions.space8),
           gradient: const LinearGradient(
@@ -40,33 +92,31 @@ class BloothItem extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                deviceItem.advertisementData.advName.isNotEmpty
-                    ? deviceItem.advertisementData.advName
-                    : deviceItem.device.platformName.isNotEmpty
-                    ? deviceItem.device.platformName
-                    : AppString.unknownDevice.tr,
+                controller.deviceName(deviceItem),
                 style: MyTextStyle.smallDM12W400().copyWith(
                   color: AppColor.white,
-                  fontSize: Dimensions.space14,
+                  fontSize: Dimensions.space12,
                   fontFamily: AppAssets.exo2,
+                  fontWeight: FontWeight.w600,
                 ),
               ),
-              spaceDown(Dimensions.space16),
+              spaceDown(Dimensions.space8),
 
-              Center(
-                child: Text(
-                  'Very close',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 14,
-                    fontWeight: FontWeight.w300,
-                    height: 1,
-                  ),
+              Text(
+                '${controller.distanceLabel(distanceMeters)} • ${distanceMeters.toStringAsFixed(1)} m',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: Dimensions.space12,
+                  fontWeight: FontWeight.w300,
+                  height: 1,
+                  fontFamily: AppAssets.exo2,
                 ),
               ),
               spaceDown(Dimensions.space8),
               Center(
-                child: SizedBox(
+                child: Container(
+                  height: 18,
+                  margin: const EdgeInsets.symmetric(horizontal: 2),
                   child: Stack(
                     alignment: Alignment.center,
                     children: [
@@ -75,31 +125,85 @@ class BloothItem extends StatelessWidget {
                         decoration: BoxDecoration(
                           gradient: LinearGradient(
                             colors: [
-                              Colors.white.withValues(alpha: 0.35),
-                              Colors.white.withValues(alpha: 0.9),
-                              Colors.white.withValues(alpha: 0.35),
+                              Colors.white.withValues(alpha: 0.3),
+                              Colors.white.withValues(alpha: 0.92),
+                              Colors.white.withValues(alpha: 0.3),
                             ],
                           ),
                         ),
                       ),
-                      const Icon(
-                        Icons.arrow_drop_down,
-                        color: Colors.white,
-                        size: 22,
+                      Align(
+                        alignment: arrowAlignment,
+                        child: Icon(
+                          Icons.arrow_drop_down_sharp,
+                          color: Colors.white,
+                          size: Dimensions.space26,
+                        ),
                       ),
                     ],
                   ),
                 ),
               ),
-              spaceDown(8),
-              Flexible(
-                child: Text(
-                  deviceItem.device.remoteId.str,
-                  style: TextStyle(
-                    color: Colors.white.withValues(alpha: 0.28),
-                    fontSize: 11,
-                    fontWeight: FontWeight.w500,
+              spaceDown(10),
+
+              Wrap(
+                spacing: 6,
+                runSpacing: 6,
+                children: [
+                  _infoChip('RSSI', '${deviceItem.rssi} dBm'),
+                  _infoChip(
+                    'TX',
+                    deviceItem.advertisementData.txPowerLevel?.toString() ??
+                        'N/A',
                   ),
+                  _infoChip(
+                    'Conn',
+                    deviceItem.advertisementData.connectable ? 'Yes' : 'No',
+                  ),
+                  _infoChip('Svc', serviceUuids.length.toString()),
+                  _infoChip('MSD', manufacturerEntries.length.toString()),
+                  _infoChip('SvcData', serviceDataEntries.length.toString()),
+                  _infoChip(
+                    'Appear',
+                    deviceItem.advertisementData.appearance?.toString() ??
+                        'N/A',
+                  ),
+                ],
+              ),
+              spaceDown(10),
+
+              Text(
+                'Adv: ${deviceItem.advertisementData.advName.isNotEmpty ? deviceItem.advertisementData.advName : 'N/A'}',
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  color: Colors.white.withValues(alpha: 0.86),
+                  fontSize: 11,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              spaceDown(4),
+
+              Text(
+                'Manufacturer: ${manufacturerEntries.isEmpty ? 'N/A' : manufacturerEntries.map((entry) => '${entry.key}: ${_formatBytes(entry.value)}').join(' | ')}',
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  color: Colors.white.withValues(alpha: 0.72),
+                  fontSize: 10.5,
+                  fontWeight: FontWeight.w400,
+                ),
+              ),
+              spaceDown(4),
+
+              Text(
+                'Service data: ${serviceDataEntries.isEmpty ? 'N/A' : serviceDataEntries.map((entry) => '${entry.key}: ${_formatBytes(entry.value)}').join(' | ')}',
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  color: Colors.white.withValues(alpha: 0.72),
+                  fontSize: 10.5,
+                  fontWeight: FontWeight.w400,
                 ),
               ),
             ],
