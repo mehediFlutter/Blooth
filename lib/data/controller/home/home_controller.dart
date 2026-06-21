@@ -104,7 +104,7 @@ class HomeController extends GetxController {
 
   String distanceLabel(double distance) {
     if (distance <= 1) {
-      return 'Very close';
+      return 'Very Close';
     }
     if (distance <= 3) {
       return 'Close';
@@ -112,6 +112,6 @@ class HomeController extends GetxController {
     if (distance <= 6) {
       return 'Far';
     }
-    return 'Very far';
+    return 'Very Far';
   }
 }

@@ -6,6 +6,7 @@ class AppAssets {
 
   static const String blooth = '$icon/bluetooth.jpg';
   static const String flutterIcon = '$icon/flutter_icon.jpg';
+  static const String distance = '$icon/distance.png';
 
   static const String bloothScan = '$lottie/Bluetooth Grey wave.json';
 
