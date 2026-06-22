@@ -18,6 +18,9 @@ class HomeController extends GetxController {
 
       for (final r in results) {
         final remoteId = r.device.remoteId.str;
+        printX('REMOTE ID: $remoteId');
+        printX('NAME: ${r.device.platformName}');
+
         final resolvedName = _resolveDeviceName(r, remoteId);
 
         printX(
@@ -34,6 +37,9 @@ class HomeController extends GetxController {
   }
 
   String _resolveDeviceName(ScanResult result, String remoteId) {
+    print("=== advName: ${result.advertisementData.advName}");
+    print("=== platformName: ${result.device.platformName}");
+    print("=== remoteId: ${result.device.remoteId.str}");
     final advName = result.advertisementData.advName.trim();
     if (advName.isNotEmpty) {
       return advName;
