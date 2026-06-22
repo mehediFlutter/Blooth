@@ -13,12 +13,13 @@ class HomeController extends GetxController {
   final Map<String, String> _deviceNameCache = {};
   final Map<String, BluetoothConnectionState> _connectionStateCache = {};
   final Set<String> _connectingDevices = {};
+  final Map<String, ScanResult> _restoredConnectedDevices = {};
 
   @override
   void onInit() {
     super.onInit();
 
-    _restoreConnectedDevices();
+    _restoreSystemConnectedDevices();
 
     scanResultsSubscription = FlutterBluePlus.scanResults.listen((results) {
       final devices = <String, ScanResult>{};
@@ -33,17 +34,44 @@ class HomeController extends GetxController {
         devices[remoteId] = _mergeResult(r, resolvedName);
       }
 
+      devices.addAll(_restoredConnectedDevices);
       availableDevice = devices.values.toList();
       update();
     }, onError: (e) => printX(e));
   }
 
-  Future<void> _restoreConnectedDevices() async {
+  ScanResult _buildRestoredScanResult(BluetoothDevice device) {
+    final remoteId = device.remoteId.str;
+    final resolvedName = _cleanDeviceName(device.platformName, remoteId) ??
+        _deviceNameCache[remoteId] ??
+        remoteId;
+
+    return ScanResult(
+      device: device,
+      advertisementData: AdvertisementData(
+        advName: resolvedName,
+        txPowerLevel: null,
+        appearance: null,
+        connectable: true,
+        manufacturerData: const {},
+        serviceData: const {},
+        serviceUuids: const [],
+      ),
+      rssi: -59,
+      timeStamp: DateTime.now(),
+    );
+  }
+
+  Future<void> _restoreSystemConnectedDevices() async {
     try {
-      final connectedDevices = FlutterBluePlus.connectedDevices;
+      final connectedDevices = await FlutterBluePlus.systemDevices([]);
       for (final device in connectedDevices) {
         _watchConnectionState(device);
+        final remoteId = device.remoteId.str;
+        _connectionStateCache[remoteId] = BluetoothConnectionState.connected;
+        _restoredConnectedDevices[remoteId] = _buildRestoredScanResult(device);
       }
+      availableDevice = _restoredConnectedDevices.values.toList();
       update();
     } catch (e) {
       printX(e);
@@ -58,8 +86,28 @@ class HomeController extends GetxController {
 
     _connectionSubscriptions[remoteId] = device.connectionState.listen((state) {
       _connectionStateCache[remoteId] = state;
+      if (state == BluetoothConnectionState.disconnected) {
+        _restoredConnectedDevices.remove(remoteId);
+      }
       update();
     }, onError: (e) => printX(e));
+  }
+
+  bool _looksLikeMacAddress(String value) {
+    return RegExp(r'^([0-9A-Fa-f]{2}:){5}[0-9A-Fa-f]{2}$').hasMatch(value);
+  }
+
+  String? _cleanDeviceName(String? value, String remoteId) {
+    final name = value?.trim() ?? '';
+    if (name.isEmpty) {
+      return null;
+    }
+
+    if (name == remoteId || _looksLikeMacAddress(name)) {
+      return null;
+    }
+
+    return name;
   }
 
   String _resolveDeviceName(ScanResult result, String remoteId) {
