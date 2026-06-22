@@ -9,6 +9,8 @@ class AppAssets {
   static const String distance = '$icon/distance.png';
 
   static const String bloothScan = '$lottie/Bluetooth Grey wave.json';
+  static const String connected = '$lottie/connected.json';
+  static const String loading = '$lottie/loading.json';
 
   static const String greatVibes = '$font/GreatVibes-Regular.ttf';
 
